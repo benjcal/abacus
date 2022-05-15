@@ -1,4 +1,6 @@
-all:
+all: build
+
+build:
 	dune build
 
 clean:

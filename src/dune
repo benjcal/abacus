@@ -1,3 +1,10 @@
+(library
+ (name abacus)
+ (modules
+  (:standard \ main))
+ (libraries angstrom))
+
 (executable
  (name main)
- (libraries angstrom))
+ (modules main)
+ (libraries abacus))
