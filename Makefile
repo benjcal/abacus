@@ -9,6 +9,3 @@ run: all
 
 watch:
 	dune build --watch
-
-test:
-	dune runtest

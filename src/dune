@@ -1,11 +1,3 @@
-(library
- (name abacus)
- (modules parser file)
- (inline_tests
-  (backend qtest.lib))
- (libraries angstrom))
-
 (executable
  (name main)
- (modules main)
- (libraries abacus))
+ (libraries angstrom))
