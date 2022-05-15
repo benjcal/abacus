@@ -1,5 +1,11 @@
 open Angstrom
 
+(* helper function for testing parsers *)
+let regular_parse p s =
+  match parse_string ~consume:Prefix p s with
+  | Ok v -> v
+  | Error msg -> failwith msg
+
 type status_type = Cleared | Uncleared
 
 (* define the parsers for date
@@ -45,19 +51,38 @@ let desc = take_till (function '\n' -> true | _ -> false) <* end_of_line
 *)
 let transaction_top_p =
   lift4 (fun a b c d -> (a, b, c, d)) date status vendor desc
+;;
 
-let account =
-  end_of_line *> string "  " *> take_till (function ' ' -> true | _ -> false)
+regular_parse transaction_top_p "2022-05-02 * [vendor] hello\n"
 
-let ammount = take_till (function ' ' -> true | _ -> false) *> end_of_line
-let first_entry = lift2 (fun a b -> (a, b)) account ammount
-let trasaction = lift2 (fun a b -> (a, b)) transaction_top_p first_entry
+(* define account parse
+   format: "  account:name"
+   output: "account:name"
+*)
+let account = string "  " *> take_till (function ' ' -> true | _ -> false)
 
-let regular_parse p s =
-  match parse_string ~consume:Prefix p s with
-  | Ok v -> v
-  | Error msg ->
-      failwith msg regular_parse trasaction
-        {|2022-05-02 * [aa] this is some description!
-  acc $22
-|}
+(* define ammount parse
+   format: "     $22.33"
+   output: "2233"
+*)
+let ammount =
+  take_till (function '$' -> true | _ -> false)
+  *> advance 1
+  *> lift2
+       (fun a b -> (a * 100) + b)
+       (take_till (function '.' -> true | _ -> false)
+       <* char '.' >>| int_of_string)
+       (take_till (function '\n' -> true | _ -> false)
+       <* end_of_line >>| int_of_string)
+
+let account_entry = lift2 (fun a b -> (a, b)) account ammount;;
+
+regular_parse account_entry "  account      $22.33\n"
+
+let trasaction = lift2 (fun a b -> (a, b)) transaction_top_p account_entry
+
+let tt = {|2022-05-02 ! [vendor] desc
+  account $33.44
+|};;
+
+regular_parse trasaction tt
