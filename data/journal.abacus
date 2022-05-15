@@ -1,0 +1,31 @@
+# comments start with #
+
+# accounts are declared by the account directive. Accounts refer to 
+# real accounts like banks or credit cards and they need to be defined before using them
+
+account mybank:accountOne
+account cc:creditcardTwo
+
+
+# categories are places where money is allocated
+
+category:bills
+category:shopping
+category:food
+
+# transactions are what happen
+
+# income transactions place money in the virtual TBB (To Be Budgeted) category
+2022-05-01 * payday
+  tbb     $500.00
+  salary
+
+2022-05-01 budget
+  category:bills      $300.00
+  category:food       $150.00
+  category:shopping   $50.00
+  tbb
+
+2022-05-05 * [vendor] description of transaction
+  category:food       $55.00
+  cc:creditcardTwo

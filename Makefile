@@ -4,5 +4,8 @@ all:
 clean:
 	dune clean
 
-run:
-	dune exec src/oadder.exe
+run: all
+	dune exec src/main.exe
+
+watch:
+	dune build --watch
